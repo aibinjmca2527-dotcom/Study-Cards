@@ -75,20 +75,17 @@ function drawBackCard(
     for (let lineIndex = 0; lineIndex < card.backLines.length; lineIndex++) {
       const line = card.backLines[lineIndex];
       const normY = box.y + paddingMm + lineIndex * card.lineHeightMm;
+      const lineText = line.segments.map(s => s.text).join('');
 
-      let normX = box.x + paddingMm;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(card.fontSizePt);
 
-      for (const segment of line.segments) {
-        doc.setFont('helvetica', segment.bold ? 'bold' : 'normal');
-        doc.setFontSize(card.fontSizePt);
+      // In 180° rotation around (cx, cy):
+      // The start anchor is at (2 * cx - (box.x + paddingMm), 2 * cy - normY)
+      const rotX = 2 * cx - (box.x + paddingMm);
+      const rotY = 2 * cy - normY;
 
-        // Invert point around card center
-        const rotX = 2 * cx - normX;
-        const rotY = 2 * cy - normY;
-
-        doc.text(segment.text, rotX, rotY, { angle: 180, baseline: 'top' });
-        normX += doc.getTextWidth(segment.text);
-      }
+      doc.text(lineText, rotX, rotY, { angle: 180, baseline: 'top' });
     }
   }
 }

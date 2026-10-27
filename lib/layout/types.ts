@@ -74,7 +74,7 @@ export interface LayoutSettings {
   minWidthMm: number;     // default 40 mm
   maxWidthMm: number;     // default 50 mm
   maxHeightMm: number;    // default 40 mm
-  paddingMm: number;      // default 0.35 mm
+  paddingMm: number;      // default 1.2 mm
   cardGapMm: number;      // default 0.6 mm
 }
 
@@ -88,6 +88,6 @@ export const DEFAULT_LAYOUT_SETTINGS: LayoutSettings = {
   minWidthMm: 40,
   maxWidthMm: 50,
   maxHeightMm: 40,
-  paddingMm: 0.35,
+  paddingMm: 1.2,
   cardGapMm: 0.6,
 };

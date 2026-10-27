@@ -342,9 +342,55 @@ describe('5. Duplex Accuracy & Geometry', () => {
     expect(doc.getNumberOfPages()).toBeGreaterThanOrEqual(6);
   });
 
+    it('guarantees text never bleeds outside card box boundaries', () => {
+    const testCases: RawCardInput[] = [
+      {
+        id: 't-tuple',
+        question: 'What is a Tuple?',
+        answer:
+          'A tuple is a collection used to store multiple values. Tuples are ordered collections of elements. A tuple is usually created using parentheses. For example, (10, 20, 30) is a tuple. Tuples support indexing like lists. The first element has index zero. The main difference is that tuples are immutable. This means we cannot normally change their elements after creation. Lists, on the other hand, are mutable. Tuples can contain different types of values. They can also contain duplicate values. Tuples are useful when data should remain unchanged. They can be used to store fixed collections of values. Tuples can also be used as dictionary keys in suitable cases. Therefore, tuples are useful when we need an unchangeable collection.',
+      },
+    ];
+
+    const result = runLayoutPipeline(testCases, DEFAULT_LAYOUT_SETTINGS);
+    const layout = result.cardLayouts[0];
+
+    // Card height must comfortably accommodate text height + 2 * paddingMm
+    expect(layout.heightMm).toBeGreaterThanOrEqual(
+      layout.frontTextHeightMm + 2 * DEFAULT_LAYOUT_SETTINGS.paddingMm
+    );
+    expect(layout.heightMm).toBeGreaterThanOrEqual(
+      layout.backTextHeightMm + 2 * DEFAULT_LAYOUT_SETTINGS.paddingMm
+    );
+
+    // Front lines and back lines must not exceed usable card width
+    const usableWidth = layout.widthMm - 2 * DEFAULT_LAYOUT_SETTINGS.paddingMm;
+    for (const line of layout.frontLines) {
+      expect(line.widthMm).toBeLessThanOrEqual(usableWidth + 0.05);
+    }
+    for (const line of layout.backLines) {
+      expect(line.widthMm).toBeLessThanOrEqual(usableWidth + 0.05);
+    }
+  });
+
   it('generates a 2-page calibration sheet PDF', () => {
     const calDoc = generateCalibrationPdf(DEFAULT_LAYOUT_SETTINGS);
     expect(calDoc.getNumberOfPages()).toBe(2);
+  });
+
+  it('generates double-sided PDF with rotateBack180=true without errors', () => {
+    const sampleCards: RawCardInput[] = [
+      { id: 'c1', question: '== vs Is', answer: 'The == and is operators are used for comparison in Python.' },
+    ];
+    const result = runLayoutPipeline(sampleCards, {
+      ...DEFAULT_LAYOUT_SETTINGS,
+      rotateBack180: true,
+    });
+    const doc = generateCardsPdf(result.sheets, {
+      ...DEFAULT_LAYOUT_SETTINGS,
+      rotateBack180: true,
+    });
+    expect(doc.getNumberOfPages()).toBe(2);
   });
 });
 

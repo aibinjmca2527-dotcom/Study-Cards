@@ -78,20 +78,22 @@ function evaluateCandidate(
   const backLines = wrapTokensToLines(backTokens, usableWidth, fontSizePt, doc);
 
   const fontHeightMm = (fontSizePt * 25.4) / 72;
-  const frontTextHeightMm = frontLines.length > 0 ? (frontLines.length - 1) * lineHeightMm + fontHeightMm : 0;
-  const backTextHeightMm = backLines.length > 0 ? (backLines.length - 1) * lineHeightMm + fontHeightMm : 0;
+  // Account for full vertical glyph span (ascender + cap height + descenders) ~1.28 * fontHeight
+  const fontTotalHeightMm = fontHeightMm * 1.28;
+  const frontTextHeightMm = frontLines.length > 0 ? (frontLines.length - 1) * lineHeightMm + fontTotalHeightMm : 0;
+  const backTextHeightMm = backLines.length > 0 ? (backLines.length - 1) * lineHeightMm + fontTotalHeightMm : 0;
 
   if (frontTextHeightMm > usableHeight || backTextHeightMm > usableHeight) {
     return null;
   }
 
-  // Zero-waste card height: smallest box hugging the taller side, plus padding and descender clearance
+  // Zero-waste card height: smallest box hugging the taller side, plus top/bottom padding and safety margin
   const textHeight = Math.max(frontTextHeightMm, backTextHeightMm);
-  // Ensure a reasonable minimum height (at least 9mm for micro text <= 4.5pt, 10mm for <= 5.5pt, 12mm otherwise)
-  const minH = fontSizePt <= 4.5 ? 9 : fontSizePt <= 5.5 ? 10 : 12;
+  // Ensure a reasonable minimum height (at least 10mm for micro text <= 4.5pt, 12mm for <= 5.5pt, 14mm otherwise)
+  const minH = fontSizePt <= 4.5 ? 10 : fontSizePt <= 5.5 ? 12 : 14;
   const heightMm = Math.min(
     maxHeightMm,
-    Math.max(minH, Math.ceil((textHeight + 2 * paddingMm + 0.3) * 10) / 10)
+    Math.max(minH, Math.ceil((textHeight + 2 * paddingMm + 0.8) * 10) / 10)
   );
   const areaMm2 = widthMm * heightMm;
 
@@ -129,12 +131,12 @@ export function calculateCardLayout(
 ): CardLayout {
   const doc = getMeasureDoc();
   const {
-    minFontSizePt = 5.0,
-    maxFontSizePt = 7.0,
+    minFontSizePt = 4.5,
+    maxFontSizePt = 6.5,
     minWidthMm = 40,
     maxWidthMm = 50,
     maxHeightMm = 40,
-    paddingMm = 0.35,
+    paddingMm = 1.2,
   } = settings;
 
   // Ensure safe range
