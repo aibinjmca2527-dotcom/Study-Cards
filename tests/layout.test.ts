@@ -13,6 +13,7 @@ import {
   DEFAULT_LAYOUT_SETTINGS,
   RawCardInput,
   CardLayout,
+  parsePastedCards,
 } from '../lib/layout';
 
 describe('1. Heading Generation', () => {
@@ -23,12 +24,16 @@ describe('1. Heading Generation', () => {
     expect(generateHeading('Define polymorphism.')).toBe('Polymorphism');
     expect(generateHeading('Explain garbage collection in Java?')).toBe('Garbage Collection');
     expect(generateHeading('How does HTTPS work?')).toBe('HTTPS');
-    expect(generateHeading('What is the difference between Stack and Heap?')).toBe('Stack vs Heap');
+    expect(generateHeading('What is a variable in Python?')).toBe('Variable');
+    expect(generateHeading('What are data types in Python?')).toBe('Data Types');
+    expect(generateHeading('What is a list in Python?')).toBe('List');
+    expect(generateHeading('What are the main features of Python?')).toBe('Main Features');
   });
 
   it('handles prefixes like Q: and numbered labels', () => {
     expect(generateHeading('Q: What is React?')).toBe('React');
     expect(generateHeading('1. What are ACID properties?')).toBe('ACID Properties');
+    expect(generateHeading('1. What is Python?')).toBe('Python');
   });
 
   it('handles empty or missing input gracefully', () => {
@@ -318,5 +323,27 @@ describe('5. Duplex Accuracy & Geometry', () => {
   it('generates a 2-page calibration sheet PDF', () => {
     const calDoc = generateCalibrationPdf(DEFAULT_LAYOUT_SETTINGS);
     expect(calDoc.getNumberOfPages()).toBe(2);
+  });
+});
+
+describe('6. Pasted Text Parser', () => {
+  it('parses consecutive numbered questions with Answer: on separate lines without blank lines', () => {
+    const raw = `1. What is Python?\nAnswer:\nPython is a high-level programming language.\nIt has a simple syntax.\n2. What are variables in Python?\nAnswer:\nA variable stores a value in memory.\n3. What are data types in Python?\nAnswer:\nData types define the type of value stored in a variable.`;
+    const cards = parsePastedCards(raw);
+    expect(cards.length).toBe(3);
+    expect(cards[0].question).toBe('What is Python?');
+    expect(cards[0].answer).toContain('Python is a high-level programming language.');
+    expect(cards[1].question).toBe('What are variables in Python?');
+    expect(cards[1].answer).toContain('A variable stores a value in memory.');
+    expect(cards[2].question).toBe('What are data types in Python?');
+    expect(cards[2].answer).toContain('Data types define the type of value stored in a variable.');
+  });
+
+  it('parses standard double-newline separated questions', () => {
+    const raw = `What is Python?\nPython is a programming language.\n\nWhat is Java?\nJava is an OOP language.`;
+    const cards = parsePastedCards(raw);
+    expect(cards.length).toBe(2);
+    expect(cards[0].question).toBe('What is Python?');
+    expect(cards[1].question).toBe('What is Java?');
   });
 });

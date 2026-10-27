@@ -54,8 +54,11 @@ export function generateHeading(rawQuestion: string): string {
     }
   }
 
-  // 5. Remove trailing filler phrases
-  q = q.replace(/\s+(?:stand\s+for|used\s+for|work|works|operate|operates|mean|means|do|in\s+programming|in\s+simple\s+terms)$/i, '').trim();
+  // 5. Remove trailing filler phrases and language qualifiers (e.g. "in Python", "of Python", "in programming")
+  q = q.replace(/\s+(?:stand\s+for|used\s+for|work|works|operate|operates|mean|means|do|in\s+simple\s+terms)$/i, '').trim();
+  // Strip trailing "in [Language]" or "of [Language]" if there are other words before it
+  q = q.replace(/\b(.+?)\s+(?:in|of)\s+[a-zA-Z0-9#+]+\s*$/i, '$1').trim();
+  q = q.replace(/\s+(?:in\s+programming|in\s+computer\s+science)$/i, '').trim();
 
   // 6. Clean leading/trailing articles or prepositions left over
   q = q.replace(/^(?:a|an|the|of|in|for|to)\s+/i, '').trim();

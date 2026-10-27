@@ -44,8 +44,8 @@ function AppContent() {
   const isDemo = searchParams.get('demo') === 'true';
 
   // --- State ---
-  const [inputText, setInputText] = useState<string>(DEFAULT_SAMPLE_TEXT);
-  const [cards, setCards] = useState<RawCardInput[]>(PRELOADED_TEST_CARDS);
+  const [inputText, setInputText] = useState<string>(isDemo ? DEFAULT_SAMPLE_TEXT : '');
+  const [cards, setCards] = useState<RawCardInput[]>(isDemo ? PRELOADED_TEST_CARDS : []);
   const [activeTab, setActiveTab] = useState<'paste' | 'list'>('paste');
   const [previewTab, setPreviewTab] = useState<'cards' | 'sheet'>('cards');
   const [selectedCardIndex, setSelectedCardIndex] = useState<number>(0);
@@ -283,19 +283,19 @@ function AppContent() {
               {activeTab === 'paste' ? (
                 <div>
                   <label htmlFor="qa-input" className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
-                    Paste pairs below (Question on first line, answer below, separated by blank lines):
+                    Paste pairs below (Question on first line, answer below; supports numbered lists, "Answer:" prefixes, or blank lines):
                   </label>
                   <textarea
                     id="qa-input"
                     value={inputText}
                     onChange={e => handleTextChange(e.target.value)}
-                    placeholder={`What is Java?\nJava is a high-level, object-oriented programming language...\n\nWhat is Python?\nPython is a versatile programming language...`}
+                    placeholder={`1. What is Python?\nAnswer:\nPython is a high-level programming language.\nIt has a simple syntax.\n\n2. What are variables?\nAnswer:\nA variable stores a value in a program.\nVariables are mutable.`}
                     rows={13}
                     className="w-full font-mono text-xs leading-relaxed p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-950/60 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y"
                   />
                   <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500">
-                    <span>Accepts standard format and "Q:" / "A:" prefixes</span>
-                    <span>{cards.length} cards detected</span>
+                    <span>Supports numbered questions (1., 2.), "Answer:" prefixes, and blank lines</span>
+                    <span className="font-semibold text-slate-600 dark:text-slate-400">{cards.length} cards detected</span>
                   </div>
                 </div>
               ) : (
@@ -638,9 +638,23 @@ function AppContent() {
                   )}
                 </div>
               ) : (
-                <div className="h-72 flex flex-col items-center justify-center p-8 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-400">
-                  <p className="text-sm">No cards to inspect</p>
-                  <p className="text-xs text-slate-500 mt-1">Paste Q&A pairs on the left to start</p>
+                <div className="h-80 flex flex-col items-center justify-center p-8 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 text-slate-500">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3">
+                    <FileText className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">
+                    No Cards Added Yet
+                  </h4>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 max-w-xs mb-4">
+                    Paste your question-and-answer pairs on the left to instantly preview double-sided flashcards and A4 sheets.
+                  </p>
+                  <button
+                    onClick={handleLoadSample}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 transition-colors"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Try Sample Deck</span>
+                  </button>
                 </div>
               )
             ) : (
