@@ -31,9 +31,10 @@ async function rasterize() {
     const renderContext = {
       canvasContext: ctx as any,
       viewport,
+      canvas: canvas as any,
     };
 
-    await page.render(renderContext).promise;
+    await (page.render(renderContext as any) as any).promise;
 
     const outPath = path.resolve(
       process.cwd(),
