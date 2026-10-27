@@ -51,42 +51,33 @@ function drawBackCard(
   const card = box.card;
   doc.setTextColor(20, 20, 20);
 
-  if (!rotateBack180) {
-    // Standard back orientation
-    let currentY = box.y + paddingMm;
+  if (rotateBack180) {
+    // Exact mathematical 180° rigid-body rotation around the card's center (cx, cy)
+    const k = 72 / 25.4;
+    const cxPt = (box.x + box.width / 2) * k;
+    const cyPt = (PAGE_A4_HEIGHT_MM - (box.y + box.height / 2)) * k;
+    doc.saveGraphicsState();
+    const mat = new (doc as any).Matrix(-1, 0, 0, -1, 2 * cxPt, 2 * cyPt);
+    doc.setCurrentTransformationMatrix(mat);
+  }
 
-    for (const line of card.backLines) {
-      let currentX = box.x + paddingMm;
+  let currentY = box.y + paddingMm;
 
-      for (const segment of line.segments) {
-        doc.setFont('helvetica', segment.bold ? 'bold' : 'normal');
-        doc.setFontSize(card.fontSizePt);
-        doc.text(segment.text, currentX, currentY, { baseline: 'top' });
-        currentX += doc.getTextWidth(segment.text);
-      }
+  for (const line of card.backLines) {
+    let currentX = box.x + paddingMm;
 
-      currentY += card.lineHeightMm;
-    }
-  } else {
-    // 180° rotation around back card center (cx, cy)
-    const cx = box.x + box.width / 2;
-    const cy = box.y + box.height / 2;
-
-    for (let lineIndex = 0; lineIndex < card.backLines.length; lineIndex++) {
-      const line = card.backLines[lineIndex];
-      const normY = box.y + paddingMm + lineIndex * card.lineHeightMm;
-      const lineText = line.segments.map(s => s.text).join('');
-
-      doc.setFont('helvetica', 'normal');
+    for (const segment of line.segments) {
+      doc.setFont('helvetica', segment.bold ? 'bold' : 'normal');
       doc.setFontSize(card.fontSizePt);
-
-      // In 180° rotation around (cx, cy):
-      // The start anchor is at (2 * cx - (box.x + paddingMm), 2 * cy - normY)
-      const rotX = 2 * cx - (box.x + paddingMm);
-      const rotY = 2 * cy - normY;
-
-      doc.text(lineText, rotX, rotY, { angle: 180, baseline: 'top' });
+      doc.text(segment.text, currentX, currentY, { baseline: 'top' });
+      currentX += doc.getTextWidth(segment.text);
     }
+
+    currentY += card.lineHeightMm;
+  }
+
+  if (rotateBack180) {
+    doc.restoreGraphicsState();
   }
 }
 

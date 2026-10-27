@@ -378,14 +378,28 @@ describe('5. Duplex Accuracy & Geometry', () => {
     expect(calDoc.getNumberOfPages()).toBe(2);
   });
 
-  it('generates double-sided PDF with rotateBack180=true without errors', () => {
+  it('generates double-sided PDF with rotateBack180=true without errors and preserves exact Y alignment', () => {
     const sampleCards: RawCardInput[] = [
-      { id: 'c1', question: '== vs Is', answer: 'The == and is operators are used for comparison in Python.' },
+      { id: 'c1', question: '== vs Is', answer: 'The == and is operators are used for comparison in Python. The == operator compares values.' },
     ];
     const result = runLayoutPipeline(sampleCards, {
       ...DEFAULT_LAYOUT_SETTINGS,
       rotateBack180: true,
+      duplexEdge: 'long',
     });
+    // For long-edge duplex, front and back cards MUST have identical vertical position Y
+    expect(result.sheets[0].backCards[0].y).toBe(result.sheets[0].frontCards[0].y);
+    expect(result.sheets[0].backCards[0].height).toBe(result.sheets[0].frontCards[0].height);
+
+    // Text clearance test: ensure bottom line never touches box border (at least 1.5 mm clearance)
+    const card = result.cardLayouts[0];
+    const fontHeightMm = (card.fontSizePt * 25.4) / 72;
+    const fontTotalHeightMm = fontHeightMm * 1.35;
+    const frontLastBottom = DEFAULT_LAYOUT_SETTINGS.paddingMm + (card.frontLines.length - 1) * card.lineHeightMm + fontTotalHeightMm;
+    const backLastBottom = DEFAULT_LAYOUT_SETTINGS.paddingMm + (card.backLines.length - 1) * card.lineHeightMm + fontTotalHeightMm;
+    expect(card.heightMm - frontLastBottom).toBeGreaterThanOrEqual(1.5);
+    expect(card.heightMm - backLastBottom).toBeGreaterThanOrEqual(1.5);
+
     const doc = generateCardsPdf(result.sheets, {
       ...DEFAULT_LAYOUT_SETTINGS,
       rotateBack180: true,

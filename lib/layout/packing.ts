@@ -66,13 +66,6 @@ export function packCardsIntoSheets(
           backY = Math.round((pageHeight - f.y - f.height) * 1000) / 1000;
         }
 
-        // If rotateBack180 is true, the printer driver mechanically inverts the entire sheet by 180°.
-        // Pre-rotate back box coordinates around the sheet center to guarantee exact duplex alignment.
-        if (rotateBack180) {
-          backX = Math.round((pageWidth - backX - f.width) * 1000) / 1000;
-          backY = Math.round((pageHeight - backY - f.height) * 1000) / 1000;
-        }
-
         return {
           card: f.card,
           x: backX,
