@@ -246,7 +246,7 @@ export default function LandingPage() {
               Built for Serious Exam Preparation
             </h2>
             <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Engineered with physical printer calibration
+              Engineered with sub-millimeter duplex accuracy
             </h3>
           </div>
 
@@ -330,10 +330,10 @@ export default function LandingPage() {
             <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800">
               <h4 className="font-bold text-base mb-1.5 flex items-center gap-2">
                 <HelpCircle className="w-4 h-4 text-indigo-500" />
-                What does the "Calibration Sheet" do?
+                How do I verify double-sided alignment?
               </h4>
               <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                The calibration sheet is a 2-page test PDF featuring 4 sample cards and alignment crosshairs in all 4 corners and center. Print it first and hold it to a light: if the front and back crosshairs align, your printer duplex settings are 100% verified!
+                Print your first sheet double-sided at 100% scale (turn "Fit to page" OFF). Hold the paper up to any window or light: the front and back rectangular cut lines will overlap as a single shadow, ready for clean scissors cutting.
               </p>
             </div>
 

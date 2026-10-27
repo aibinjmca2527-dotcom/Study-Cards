@@ -5,14 +5,12 @@ import { DuplexEdge } from '@/lib/layout';
 interface PrintInstructionsBoxProps {
   duplexEdge: DuplexEdge;
   rotateBack180: boolean;
-  onOpenCalibration?: () => void;
   onOpenGuide?: () => void;
 }
 
 export function PrintInstructionsBox({
   duplexEdge,
   rotateBack180,
-  onOpenCalibration,
   onOpenGuide,
 }: PrintInstructionsBoxProps) {
   return (
@@ -69,21 +67,9 @@ export function PrintInstructionsBox({
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-amber-500/20 text-xs">
-        <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-          <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
-          <span>Always print <strong>1 trial sheet</strong> or a <strong>calibration sheet</strong> before printing large sets.</span>
-        </div>
-
-        {onOpenCalibration && (
-          <button
-            onClick={onOpenCalibration}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 font-semibold transition-colors shrink-0"
-          >
-            <RotateCw className="w-3.5 h-3.5" />
-            <span>Download Calibration Sheet</span>
-          </button>
-        )}
+      <div className="flex items-center gap-2 pt-3 border-t border-amber-500/20 text-xs text-slate-600 dark:text-slate-300">
+        <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+        <span>Always print <strong>1 trial sheet</strong> before cutting to verify your printer alignment.</span>
       </div>
     </div>
   );

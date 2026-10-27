@@ -106,7 +106,7 @@ export function generateCardsPdf(
   });
 
   const {
-    paddingMm = 0.35,
+    paddingMm = DEFAULT_LAYOUT_SETTINGS.paddingMm,
     rotateBack180 = false,
   } = settings;
 

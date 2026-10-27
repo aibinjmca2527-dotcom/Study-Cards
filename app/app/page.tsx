@@ -18,7 +18,6 @@ import {
   formatCardsToText,
   runLayoutPipeline,
   generateCardsPdf,
-  generateCalibrationPdf,
   DuplexEdge,
   TextSizeMode,
 } from '@/lib/layout';
@@ -176,15 +175,6 @@ function AppContent() {
     }
   };
 
-  // Download Calibration PDF
-  const handleDownloadCalibration = () => {
-    try {
-      const doc = generateCalibrationPdf(settings);
-      doc.save(`CardCut-Calibration-${settings.duplexEdge}-edge.pdf`);
-    } catch (err) {
-      console.error('Calibration PDF generation error:', err);
-    }
-  };
 
   // Load sample deck
   const handleLoadSample = () => {
@@ -224,15 +214,6 @@ function AppContent() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
-            {/* Calibration Sheet Button */}
-            <button
-              onClick={handleDownloadCalibration}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 transition-colors shadow-sm"
-              title="Print a 2-page test sheet with alignment crosshairs to verify your printer duplex"
-            >
-              <RotateCw className="w-3.5 h-3.5 text-indigo-500" />
-              <span>Calibration Sheet</span>
-            </button>
 
             {/* Primary Download PDF Button */}
             <button
@@ -686,7 +667,6 @@ function AppContent() {
             <PrintInstructionsBox
               duplexEdge={settings.duplexEdge}
               rotateBack180={settings.rotateBack180}
-              onOpenCalibration={handleDownloadCalibration}
               onOpenGuide={() => setIsGuideOpen(true)}
             />
           </div>
