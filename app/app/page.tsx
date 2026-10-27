@@ -7,6 +7,7 @@ import { Footer } from '@/components/Footer';
 import { CardPreview } from '@/components/CardPreview';
 import { SheetPreview } from '@/components/SheetPreview';
 import { PrintInstructionsBox } from '@/components/PrintInstructionsBox';
+import { SettingsGuideModal } from '@/components/SettingsGuideModal';
 import {
   RawCardInput,
   LayoutSettings,
@@ -37,6 +38,7 @@ import {
   Sparkles,
   RefreshCw,
   Search,
+  HelpCircle,
 } from 'lucide-react';
 
 function AppContent() {
@@ -52,6 +54,7 @@ function AppContent() {
   const [activeSheetIndex, setActiveSheetIndex] = useState<number>(0);
   const [isPending, startTransition] = useTransition();
   const [searchFilter, setSearchFilter] = useState('');
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   // Settings
   const [settings, setSettings] = useState<LayoutSettings>(DEFAULT_LAYOUT_SETTINGS);
@@ -449,58 +452,88 @@ function AppContent() {
 
             {/* SETTINGS PANEL */}
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 shadow-sm space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                <h3 className="text-sm font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
+                <div className="flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-indigo-500" />
-                  <span>Printer & Layout Settings</span>
-                </h3>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500">
-                  A4: 210 × 297 mm
-                </span>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                    Printer & Layout Settings
+                  </h3>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsGuideOpen(true)}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 px-2.5 py-1 rounded-lg transition-colors"
+                  >
+                    <HelpCircle className="w-3.5 h-3.5" />
+                    <span>Explain these settings</span>
+                  </button>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500">
+                    A4: 210 × 297 mm
+                  </span>
+                </div>
               </div>
 
               {/* Duplex Flip Edge Selection */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Duplex Flip Edge:
-                </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Duplex Flip Edge (How you turn the paper):
+                  </label>
+                  <span className="text-[11px] text-slate-400">Matches your printer dialog</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <button
                     onClick={() => setSettings(s => ({ ...s, duplexEdge: 'long' }))}
-                    className={`px-3 py-2 rounded-xl text-xs font-semibold border flex flex-col items-center gap-0.5 transition-all ${
+                    className={`px-3.5 py-2.5 rounded-xl text-xs font-semibold border flex flex-col items-start gap-1 transition-all text-left ${
                       settings.duplexEdge === 'long'
                         ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-600'
                         : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                     }`}
                   >
-                    <span>Long-Edge Flip</span>
-                    <span className="text-[10px] font-normal opacity-70">Book / Tablet style</span>
+                    <div className="flex items-center justify-between w-full">
+                      <span className="font-bold flex items-center gap-1">📖 Long-Edge Flip</span>
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                        95% of printers
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-normal opacity-80">
+                      Flips like a book or tablet (Left ↔ Right)
+                    </span>
                   </button>
 
                   <button
                     onClick={() => setSettings(s => ({ ...s, duplexEdge: 'short' }))}
-                    className={`px-3 py-2 rounded-xl text-xs font-semibold border flex flex-col items-center gap-0.5 transition-all ${
+                    className={`px-3.5 py-2.5 rounded-xl text-xs font-semibold border flex flex-col items-start gap-1 transition-all text-left ${
                       settings.duplexEdge === 'short'
                         ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-600'
                         : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                     }`}
                   >
-                    <span>Short-Edge Flip</span>
-                    <span className="text-[10px] font-normal opacity-70">Calendar / Pad style</span>
+                    <div className="flex items-center justify-between w-full">
+                      <span className="font-bold flex items-center gap-1">🗓️ Short-Edge Flip</span>
+                      <span className="text-[9px] font-medium opacity-60">Calendar style</span>
+                    </div>
+                    <span className="text-[11px] font-normal opacity-80">
+                      Flips like a wall calendar or notepad (Top ↕ Bottom)
+                    </span>
                   </button>
                 </div>
               </div>
 
               {/* Printer Margin Control */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center justify-between mb-1">
                   <label htmlFor="margin-slider" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Printer Margin:
+                    Printer Safety Margin:
                   </label>
                   <span className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400">
                     {settings.marginMm} mm
                   </span>
                 </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
+                  Blank border around paper edges so mechanical rollers don't cut off cards. 5 mm is universal.
+                </p>
                 <input
                   id="margin-slider"
                   type="range"
@@ -513,27 +546,28 @@ function AppContent() {
                 />
                 <div className="flex justify-between text-[10px] text-slate-400 mt-1">
                   <span>3 mm (Narrow)</span>
-                  <span>5 mm (Standard)</span>
+                  <span>5 mm (Recommended)</span>
                   <span>15 mm (Wide)</span>
                 </div>
               </div>
 
               {/* Back Text Rotation 180° Toggle */}
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                <label className="flex items-center justify-between cursor-pointer">
+                <label className="flex items-start justify-between cursor-pointer gap-3">
                   <div>
-                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                      <RotateCw className="w-3.5 h-3.5 text-violet-500" />
                       Rotate Back Text 180°
                     </span>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Turn this ON if your printer driver inverts the back page orientation.
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      Only turn this ON if your test print came out with the back text upside-down.
                     </p>
                   </div>
                   <input
                     type="checkbox"
                     checked={settings.rotateBack180}
                     onChange={e => setSettings(s => ({ ...s, rotateBack180: e.target.checked }))}
-                    className="w-4 h-4 accent-indigo-600 rounded cursor-pointer"
+                    className="w-4 h-4 accent-indigo-600 rounded cursor-pointer mt-0.5"
                   />
                 </label>
               </div>
@@ -544,6 +578,7 @@ function AppContent() {
               duplexEdge={settings.duplexEdge}
               rotateBack180={settings.rotateBack180}
               onOpenCalibration={handleDownloadCalibration}
+              onOpenGuide={() => setIsGuideOpen(true)}
             />
           </div>
 
@@ -703,6 +738,12 @@ function AppContent() {
             </div>
           </div>
         </div>
+
+        {/* Interactive Settings Guide Modal */}
+        <SettingsGuideModal
+          isOpen={isGuideOpen}
+          onClose={() => setIsGuideOpen(false)}
+        />
       </main>
 
       <Footer />
