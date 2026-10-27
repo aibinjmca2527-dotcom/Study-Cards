@@ -20,6 +20,7 @@ import {
   generateCardsPdf,
   generateCalibrationPdf,
   DuplexEdge,
+  TextSizeMode,
 } from '@/lib/layout';
 import {
   Scissors,
@@ -39,6 +40,7 @@ import {
   RefreshCw,
   Search,
   HelpCircle,
+  Type,
 } from 'lucide-react';
 
 function AppContent() {
@@ -89,6 +91,24 @@ function AppContent() {
     if (selectedCardIndex >= newCards.length) {
       setSelectedCardIndex(Math.max(0, newCards.length - 1));
     }
+  };
+
+  // Adjust font size dynamically
+  const handleFontSizeChange = (sizePt: number) => {
+    let preset: TextSizeMode = 'custom';
+    if (sizePt <= 4.75) preset = 'micro';
+    else if (sizePt <= 5.75) preset = 'compact';
+    else if (sizePt <= 6.75) preset = 'standard';
+    else preset = 'large';
+
+    const minPt = Math.max(3.5, Math.round((sizePt - 1.5) * 10) / 10);
+
+    setSettings(s => ({
+      ...s,
+      maxFontSizePt: sizePt,
+      minFontSizePt: minPt,
+      textSizePreset: preset,
+    }));
   };
 
   // Run pipeline reactively
@@ -548,6 +568,95 @@ function AppContent() {
                   <span>3 mm (Narrow)</span>
                   <span>5 mm (Recommended)</span>
                   <span>15 mm (Wide)</span>
+                </div>
+              </div>
+
+              {/* Card Text Size (Font Size) Control */}
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Type className="w-3.5 h-3.5 text-indigo-500" />
+                    <label htmlFor="font-size-slider" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      Card Text Size (Font Size):
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                      {settings.maxFontSizePt.toFixed(1)} pt
+                    </span>
+                    <span
+                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                        settings.maxFontSizePt <= 4.75
+                          ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
+                          : settings.maxFontSizePt <= 5.75
+                          ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
+                          : settings.maxFontSizePt <= 6.75
+                          ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
+                      }`}
+                    >
+                      {settings.maxFontSizePt <= 4.75
+                        ? '⚡ Micro'
+                        : settings.maxFontSizePt <= 5.75
+                        ? '🔹 Compact'
+                        : settings.maxFontSizePt <= 6.75
+                        ? '🔹 Standard'
+                        : '🔹 Large'}
+                    </span>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Choose smaller text to fit long answers, reduce card height, and pack more cards on one A4 sheet.
+                </p>
+
+                {/* Quick 1-Click Preset Buttons */}
+                <div className="grid grid-cols-4 gap-1.5 pt-0.5">
+                  {[
+                    { label: 'Micro', pt: 4.5, badge: '4.5 pt', icon: '⚡' },
+                    { label: 'Compact', pt: 5.5, badge: '5.5 pt', icon: '▪' },
+                    { label: 'Standard', pt: 6.5, badge: '6.5 pt', icon: '•' },
+                    { label: 'Large', pt: 7.5, badge: '7.5 pt', icon: '●' },
+                  ].map(preset => {
+                    const isSelected = Math.abs(settings.maxFontSizePt - preset.pt) < 0.25;
+                    return (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => handleFontSizeChange(preset.pt)}
+                        className={`px-2 py-1.5 rounded-xl text-xs font-semibold border flex flex-col items-center justify-center transition-all ${
+                          isSelected
+                            ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-600 shadow-sm'
+                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
+                        }`}
+                      >
+                        <span className="text-[11px] font-bold">
+                          {preset.icon} {preset.label}
+                        </span>
+                        <span className="text-[9px] font-mono opacity-70">{preset.badge}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Slider for smooth custom size adjustment */}
+                <div className="pt-1">
+                  <input
+                    id="font-size-slider"
+                    type="range"
+                    min={4.0}
+                    max={8.0}
+                    step={0.25}
+                    value={settings.maxFontSizePt}
+                    onChange={e => handleFontSizeChange(Number(e.target.value))}
+                    className="w-full accent-indigo-600 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+                    <span>4.0 pt (Smallest)</span>
+                    <span>5.5 pt (Compact)</span>
+                    <span>6.5 pt (Standard)</span>
+                    <span>8.0 pt (Largest)</span>
+                  </div>
                 </div>
               </div>
 

@@ -150,6 +150,28 @@ describe('4. Zero-waste Card Sizing', () => {
     );
     expect(hasHyphen).toBe(true);
   });
+
+  it('renders smaller text when user selects micro/compact font size', () => {
+    const heading = 'Python';
+    const answer = 'Python is a high-level interpreted programming language with dynamic semantics.';
+    const split = splitAnswer(heading, answer);
+    const layout = calculateCardLayout(
+      'card-micro',
+      heading,
+      answer,
+      answer,
+      split.front,
+      split.back,
+      {
+        ...DEFAULT_LAYOUT_SETTINGS,
+        maxFontSizePt: 4.5,
+        minFontSizePt: 3.5,
+      }
+    );
+
+    expect(layout.fontSizePt).toBeLessThanOrEqual(4.5);
+    expect(layout.fontSizePt).toBeGreaterThanOrEqual(3.5);
+  });
 });
 
 describe('5. Duplex Accuracy & Geometry', () => {

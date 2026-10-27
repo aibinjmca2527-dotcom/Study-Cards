@@ -87,10 +87,11 @@ function evaluateCandidate(
 
   // Zero-waste card height: smallest box hugging the taller side, plus padding and descender clearance
   const textHeight = Math.max(frontTextHeightMm, backTextHeightMm);
-  // Ensure a reasonable minimum height (at least 12mm) so cards are easy to hold
+  // Ensure a reasonable minimum height (at least 9mm for micro text <= 4.5pt, 10mm for <= 5.5pt, 12mm otherwise)
+  const minH = fontSizePt <= 4.5 ? 9 : fontSizePt <= 5.5 ? 10 : 12;
   const heightMm = Math.min(
     maxHeightMm,
-    Math.max(12, Math.ceil((textHeight + 2 * paddingMm + 0.3) * 10) / 10)
+    Math.max(minH, Math.ceil((textHeight + 2 * paddingMm + 0.3) * 10) / 10)
   );
   const areaMm2 = widthMm * heightMm;
 
@@ -136,9 +137,13 @@ export function calculateCardLayout(
     paddingMm = 0.35,
   } = settings;
 
-  // Step 0.25 pt descending: [7.0, 6.75, 6.5, 6.25, 6.0, 5.75, 5.5, 5.25, 5.0]
+  // Ensure safe range
+  const safeMaxPt = Math.max(minFontSizePt, maxFontSizePt);
+  const safeMinPt = Math.min(minFontSizePt, maxFontSizePt);
+
+  // Step 0.25 pt descending
   const fontSizes: number[] = [];
-  for (let pt = maxFontSizePt; pt >= minFontSizePt - 0.001; pt -= 0.25) {
+  for (let pt = safeMaxPt; pt >= safeMinPt - 0.001; pt -= 0.25) {
     fontSizes.push(Math.round(pt * 100) / 100);
   }
 
@@ -197,10 +202,10 @@ export function calculateCardLayout(
     }
   }
 
-  // If text could not fit even at minFontSize (5.0 pt) and maxWidth (50 mm):
+  // If text could not fit even at minFontSize and maxWidth:
   // Perform progressive pruning so it fits within bounds, and set warning.
-  // Capacity at 5.0 pt on 50x40 mm is roughly ~500-600 characters.
-  let budgetChars = 520;
+  // Capacity scales inversely with font size:
+  let budgetChars = Math.round(520 * (5.0 / safeMinPt));
   let pruneAttempts = 0;
 
   while (pruneAttempts < 5) {
@@ -210,14 +215,14 @@ export function calculateCardLayout(
     const resplit = splitAnswer(heading, pruned.compressed);
     curFront = resplit.front;
     curBack = resplit.back;
-    curWarning = pruned.warning || 'Answer pruned to fit maximum card dimensions at 5.0 pt.';
+    curWarning = pruned.warning || `Answer pruned to fit maximum card dimensions at ${safeMinPt.toFixed(1)} pt.`;
     frontTokens = buildFrontTokens(heading, curFront);
     backTokens = buildBackTokens(curBack);
 
     const candidate = evaluateCandidate(
       frontTokens,
       backTokens,
-      minFontSizePt,
+      safeMinPt,
       maxWidthMm,
       maxHeightMm,
       paddingMm,
@@ -244,11 +249,11 @@ export function calculateCardLayout(
     }
   }
 
-  // Fallback: force render at 5.0 pt and maxWidthMm
-  const fallbackLineHeight = getLineHeightMm(minFontSizePt);
+  // Fallback: force render at safeMinPt and maxWidthMm
+  const fallbackLineHeight = getLineHeightMm(safeMinPt);
   const usableWidth = maxWidthMm - 2 * paddingMm;
-  const frontLines = wrapTokensToLines(frontTokens, usableWidth, minFontSizePt, doc);
-  const backLines = wrapTokensToLines(backTokens, usableWidth, minFontSizePt, doc);
+  const frontLines = wrapTokensToLines(frontTokens, usableWidth, safeMinPt, doc);
+  const backLines = wrapTokensToLines(backTokens, usableWidth, safeMinPt, doc);
   const textHeight = Math.max(frontLines.length * fallbackLineHeight, backLines.length * fallbackLineHeight);
 
   return {
@@ -256,14 +261,14 @@ export function calculateCardLayout(
     heading,
     frontLines,
     backLines,
-    fontSizePt: minFontSizePt,
+    fontSizePt: safeMinPt,
     lineHeightMm: fallbackLineHeight,
     widthMm: maxWidthMm,
     heightMm: maxHeightMm,
     frontTextHeightMm: frontLines.length * fallbackLineHeight,
     backTextHeightMm: backLines.length * fallbackLineHeight,
     fillPercentage: Math.min(100, Math.round((textHeight / (maxHeightMm - 2 * paddingMm)) * 100)),
-    warning: curWarning || 'Text fits tightly at minimum font size (5.0 pt).',
+    warning: curWarning || `Text fits tightly at minimum font size (${safeMinPt.toFixed(1)} pt).`,
     frontRawText: curFront,
     backRawText: curBack,
   };

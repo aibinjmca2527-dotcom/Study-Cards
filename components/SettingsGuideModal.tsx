@@ -14,6 +14,7 @@ import {
   Sun,
   Printer,
   Maximize2,
+  Type,
 } from 'lucide-react';
 
 interface SettingsGuideModalProps {
@@ -204,11 +205,56 @@ export function SettingsGuideModal({ isOpen, onClose }: SettingsGuideModalProps)
           </div>
         </div>
 
-        {/* Setting 3: Rotate Back Text 180° */}
+        {/* Setting 3: Card Text Size (Font Size) */}
         <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 space-y-3">
           <div className="flex items-center gap-2.5">
             <span className="w-7 h-7 rounded-xl bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shadow-sm">
               3
+            </span>
+            <h4 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <Type className="w-4 h-4 text-indigo-500" />
+              Card Text Size: How to fit huge answers or make tiny cards
+            </h4>
+          </div>
+
+          <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-2">
+            <p>
+              Want your text smaller or larger? You can pick one of the 4 quick presets or drag the slider from <strong>4.0 pt to 8.0 pt</strong>:
+            </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-amber-300/60 dark:border-amber-900/40 text-xs">
+                <strong className="text-amber-800 dark:text-amber-300 flex items-center gap-1">⚡ Micro (4.5 pt)</strong>
+                <p className="text-[10px] text-slate-500 mt-1">Extra-small text. Fits 10–15 sentences easily into compact cards.</p>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-blue-300/60 dark:border-blue-900/40 text-xs">
+                <strong className="text-blue-800 dark:text-blue-300 flex items-center gap-1">▪ Compact (5.5 pt)</strong>
+                <p className="text-[10px] text-slate-500 mt-1">Small text for detailed explanations and multi-line answers.</p>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-emerald-300/60 dark:border-emerald-900/40 text-xs">
+                <strong className="text-emerald-800 dark:text-emerald-300 flex items-center gap-1">• Standard (6.5 pt)</strong>
+                <p className="text-[10px] text-slate-500 mt-1">Default balanced size. Very comfortable for normal reading.</p>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-purple-300/60 dark:border-purple-900/40 text-xs">
+                <strong className="text-purple-800 dark:text-purple-300 flex items-center gap-1">● Large (7.5 pt)</strong>
+                <p className="text-[10px] text-slate-500 mt-1">Larger font for short definitions, vocabulary, or low vision.</p>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-indigo-700 dark:text-indigo-300 font-medium">
+              💡 <strong>Pro Tip:</strong> Smaller text makes the card height shorter, meaning you can fit 30 to 40 cards onto a single A4 page!
+            </p>
+          </div>
+        </div>
+
+        {/* Setting 4: Rotate Back Text 180° */}
+        <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 space-y-3">
+          <div className="flex items-center gap-2.5">
+            <span className="w-7 h-7 rounded-xl bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shadow-sm">
+              4
             </span>
             <h4 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
               <RotateCw className="w-4 h-4 text-violet-500" />
@@ -233,11 +279,11 @@ export function SettingsGuideModal({ isOpen, onClose }: SettingsGuideModalProps)
           </div>
         </div>
 
-        {/* Setting 4: Print at 100% / Scale Actual Size */}
+        {/* Setting 5: Print at 100% / Scale Actual Size */}
         <div className="p-5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 space-y-3">
           <div className="flex items-center gap-2.5">
             <span className="w-7 h-7 rounded-xl bg-emerald-600 text-white text-xs font-bold flex items-center justify-center shadow-sm">
-              4
+              5
             </span>
             <h4 className="text-base font-bold text-emerald-950 dark:text-emerald-100 flex items-center gap-1.5">
               <Maximize2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
